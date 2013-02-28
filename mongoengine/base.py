@@ -498,6 +498,7 @@ class ObjectIdField(BaseField):
             self.error('Invalid Object ID')
 
 
+
 class DocumentMetaclass(type):
     """Metaclass for all documents.
     """
@@ -806,6 +807,7 @@ class TopLevelDocumentMetaclass(DocumentMetaclass):
         # Provide a default queryset unless one has been set
         manager = attrs.get('objects', QuerySetManager())
         new_class.objects = manager
+        new_class._default_manager = manager
 
         # Validate the fields and set primary key if needed
         for field_name, field in new_class._fields.iteritems():
@@ -882,8 +884,13 @@ class TopLevelDocumentMetaclass(DocumentMetaclass):
 
         return unique_indexes
 
+class Bunch(dict):
 
-class MetaDict(dict):
+    def __init__(self,**kw):
+        dict.__init__(self,kw)
+        self.__dict__ = self
+
+class MetaDict(Bunch):
     """Custom dictionary for meta classes.
     Handles the merging of set indexes
     """
